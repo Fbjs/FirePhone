@@ -140,16 +140,6 @@ export const useSip = () => {
             setCallState({ status: 'idle' });
             sessionRef.current = null;
         },
-        'accepted': (e: any) => {
-            const session = e.session as JsSIP.RTCSession;
-            const remoteUri = session.remote_identity.uri;
-            setCallState({
-                status: 'in-call',
-                contact: contact || { name: number, number },
-                isMuted: false,
-                isSpeaker: false
-            });
-        },
         'peerconnection': (data: { peerconnection: RTCPeerConnection }) => {
             const peerconnection = data.peerconnection;
             peerconnection.ontrack = (e) => {
