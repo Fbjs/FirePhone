@@ -56,7 +56,7 @@ export function OngoingCall({ callState, onHangup, onMuteToggle, onSpeakerToggle
       <>
       <div className="flex flex-col items-center pt-16 text-center text-foreground">
         <Avatar className="h-32 w-32 border-4 border-white shadow-lg">
-          <AvatarImage src={contact.avatarUrl} alt={contact.name} data-ai-hint="person" />
+          {contact.avatarUrl && <AvatarImage src={contact.avatarUrl} alt={contact.name} data-ai-hint="person" />}
           <AvatarFallback className="text-5xl">
             {contact.name.charAt(0)}
           </AvatarFallback>

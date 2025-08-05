@@ -20,7 +20,7 @@ export function IncomingCall({ caller, onAccept, onDecline }: IncomingCallProps)
       <div className="flex flex-col items-center justify-center text-center text-foreground">
         <p className="mb-4 text-lg text-muted-foreground">Llamada Entrante</p>
         <Avatar className="h-28 w-28 border-4 border-white shadow-lg">
-          <AvatarImage src={caller.avatarUrl} alt={caller.name} data-ai-hint="person portrait" />
+          {caller.avatarUrl && <AvatarImage src={caller.avatarUrl} alt={caller.name} data-ai-hint="person portrait" />}
           <AvatarFallback className="text-4xl">
             {caller.name.charAt(0)}
           </AvatarFallback>

@@ -100,7 +100,7 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
             <div className="flex justify-center">
               <div className="relative">
                 <Avatar className="h-24 w-24">
-                  <AvatarImage src={avatarUrl} alt="Avatar de contacto" />
+                  {avatarUrl && <AvatarImage src={avatarUrl} alt="Avatar de contacto" />}
                   <AvatarFallback>
                     <User className="h-12 w-12 text-muted-foreground" />
                   </AvatarFallback>

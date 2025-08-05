@@ -59,7 +59,7 @@ export function ContactList({ contacts, onEdit, onAdd, onCall }: ContactListProp
             <Card key={contact.id} className="overflow-hidden">
               <CardContent className="flex items-center gap-2 p-3">
                 <Avatar className="h-12 w-12">
-                  <AvatarImage src={contact.avatarUrl} alt={contact.name} data-ai-hint="person portrait" />
+                  {contact.avatarUrl && <AvatarImage src={contact.avatarUrl} alt={contact.name} data-ai-hint="person portrait" />}
                   <AvatarFallback>{contact.name.charAt(0)}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1">
