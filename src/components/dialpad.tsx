@@ -7,13 +7,18 @@ import { Phone, Delete } from 'lucide-react';
 
 interface DialpadProps {
   onCall: (number: string) => void;
+  showCallButton?: boolean;
 }
 
-export function Dialpad({ onCall }: DialpadProps) {
+export function Dialpad({ onCall, showCallButton = true }: DialpadProps) {
   const [number, setNumber] = useState('');
 
   const handleKeyPress = (key: string) => {
     setNumber((prev) => prev + key);
+    if (!showCallButton) {
+      // In-call DTMF tone simulation
+      console.log(`Sending DTMF tone: ${key}`);
+    }
   };
 
   const handleDelete = () => {
@@ -35,7 +40,7 @@ export function Dialpad({ onCall }: DialpadProps) {
           <Input
             type="tel"
             value={number}
-            readOnly
+            onChange={(e) => setNumber(e.target.value)}
             placeholder="Ingresar número"
             className="h-14 text-center text-3xl font-light tracking-wider"
           />
@@ -66,14 +71,16 @@ export function Dialpad({ onCall }: DialpadProps) {
         ))}
       </div>
       
-      <div className="w-full max-w-xs">
-         <Button
-            className="h-20 w-full rounded-full bg-accent text-accent-foreground hover:bg-accent/90"
-            onClick={handleCall}
-            disabled={!number}
-          >
-            <Phone className="h-8 w-8" />
-          </Button>
+      <div className="h-20 w-full max-w-xs">
+         {showCallButton && (
+            <Button
+                className="h-20 w-full rounded-full bg-accent text-accent-foreground hover:bg-accent/90"
+                onClick={handleCall}
+                disabled={!number}
+            >
+                <Phone className="h-8 w-8" />
+            </Button>
+         )}
       </div>
     </div>
   );

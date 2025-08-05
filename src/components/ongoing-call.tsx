@@ -41,10 +41,10 @@ export function OngoingCall({ callState, onHangup, onMuteToggle, onSpeakerToggle
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-between bg-background p-8">
        {showDialpad ? (
         <div className="flex h-full w-full flex-col">
-            <div className="pt-20">
-             <Dialpad onCall={() => {}} />
+            <div className="flex-1">
+             <Dialpad onCall={() => {}} showCallButton={false} />
             </div>
-            <div className="absolute bottom-8 w-full max-w-xs left-1/2 -translate-x-1/2 px-8">
+            <div className="w-full max-w-xs">
                  <Button onClick={() => setShowDialpad(false)} variant="outline" className="w-full h-16 rounded-full">
                     <ChevronLeft className="h-7 w-7" />
                     Volver a la llamada
