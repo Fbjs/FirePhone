@@ -3,9 +3,10 @@
 import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Mic, MicOff, PhoneOff, Volume2, VolumeX } from 'lucide-react';
+import { Mic, MicOff, PhoneOff, Volume2, VolumeX, Grid3x3 } from 'lucide-react';
 import type { InCallState } from '@/types';
 import { cn } from '@/lib/utils';
+import { Dialpad } from './dialpad';
 
 interface OngoingCallProps {
   callState: InCallState;
@@ -16,6 +17,7 @@ interface OngoingCallProps {
 
 export function OngoingCall({ callState, onHangup, onMuteToggle, onSpeakerToggle }: OngoingCallProps) {
   const [duration, setDuration] = useState(0);
+  const [showDialpad, setShowDialpad] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -37,6 +39,15 @@ export function OngoingCall({ callState, onHangup, onMuteToggle, onSpeakerToggle
 
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-between bg-background p-8">
+       {showDialpad ? (
+        <div className="flex h-full w-full flex-col items-center justify-center">
+            <Dialpad onCall={() => {}} />
+            <Button onClick={() => setShowDialpad(false)} className="mt-4">
+                Ocultar Teclado
+            </Button>
+        </div>
+      ) : (
+      <>
       <div className="flex flex-col items-center pt-20 text-center text-foreground">
         <Avatar className="h-32 w-32 border-4 border-white shadow-lg">
           <AvatarImage src={contact.avatarUrl} alt={contact.name} data-ai-hint="person" />
@@ -52,8 +63,8 @@ export function OngoingCall({ callState, onHangup, onMuteToggle, onSpeakerToggle
         <div className="flex flex-col items-center">
             <Button
               size="icon"
-              variant={isMuted ? 'secondary' : 'outline'}
-              className={cn("h-16 w-16 rounded-full", isMuted && 'bg-primary text-primary-foreground')}
+              variant="outline"
+              className={cn("h-16 w-16 rounded-full", isMuted && 'bg-primary text-primary-foreground hover:bg-primary/90')}
               onClick={onMuteToggle}
             >
               {isMuted ? <MicOff className="h-7 w-7" /> : <Mic className="h-7 w-7" />}
@@ -61,19 +72,21 @@ export function OngoingCall({ callState, onHangup, onMuteToggle, onSpeakerToggle
             <span className="mt-2 text-sm text-foreground">Silenciar</span>
         </div>
         <div className="flex flex-col items-center">
-            <Button
-              size="icon"
-              variant="outline"
-              className="h-16 w-16 rounded-full"
-            >
-                {/* Placeholder for keypad or other feature */}
-            </Button>
+             <Button
+                size="icon"
+                variant="outline"
+                className="h-16 w-16 rounded-full"
+                onClick={() => setShowDialpad(true)}
+             >
+                <Grid3x3 className="h-7 w-7" />
+             </Button>
+             <span className="mt-2 text-sm text-foreground">Teclado</span>
         </div>
         <div className="flex flex-col items-center">
             <Button
               size="icon"
-              variant={isSpeaker ? 'secondary' : 'outline'}
-              className={cn("h-16 w-16 rounded-full", isSpeaker && 'bg-primary text-primary-foreground')}
+              variant="outline"
+              className={cn("h-16 w-16 rounded-full", isSpeaker && 'bg-primary text-primary-foreground hover:bg-primary/90')}
               onClick={onSpeakerToggle}
             >
               {isSpeaker ? <VolumeX className="h-7 w-7" /> : <Volume2 className="h-7 w-7" />}
@@ -89,6 +102,8 @@ export function OngoingCall({ callState, onHangup, onMuteToggle, onSpeakerToggle
       >
         <PhoneOff className="h-8 w-8" />
       </Button>
+      </>
+      )}
     </div>
   );
 }
