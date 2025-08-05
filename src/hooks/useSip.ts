@@ -64,14 +64,13 @@ export const useSip = () => {
             isMuted: false,
             isSpeaker: false,
         }));
-    });
-    
-    newSession.on('peerconnection', (data) => {
-        const peerconnection = data.peerconnection as RTCPeerConnection;
-        peerconnection.addEventListener('track', (e) => {
+        
+        // Attach the remote audio stream when the call is accepted.
+        newSession.connection.addEventListener('track', (e) => {
             const remoteAudio = document.getElementById('remote-audio') as HTMLAudioElement;
             if (remoteAudio) {
                 remoteAudio.srcObject = e.streams[0];
+                remoteAudio.play().catch(error => console.error("Audio play failed:", error));
             }
         });
     });
