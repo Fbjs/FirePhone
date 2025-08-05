@@ -65,13 +65,17 @@ export const useSip = () => {
             isSpeaker: false,
         }));
     });
-
-    newSession.on('addstream', (ev) => {
-        const remoteAudio = document.getElementById('remote-audio') as HTMLAudioElement;
-        if (remoteAudio) {
-            remoteAudio.srcObject = (ev.stream as MediaStream);
-        }
+    
+    newSession.on('peerconnection', (data) => {
+        const peerconnection = data.peerconnection as RTCPeerConnection;
+        peerconnection.addEventListener('track', (e) => {
+            const remoteAudio = document.getElementById('remote-audio') as HTMLAudioElement;
+            if (remoteAudio) {
+                remoteAudio.srcObject = e.streams[0];
+            }
+        });
     });
+
   }, []);
 
   const handleRegistrationFailed = useCallback((e: JsSIP.RegistrationFailedEvent) => {
