@@ -66,15 +66,18 @@ export const useSip = () => {
 
     newSession.on('accepted', () => {
         const remoteUri = newSession.remote_identity.uri;
-        setCallState(prev => ({
-            status: 'in-call',
-            contact: (prev.status !== 'idle' && prev.contact) || {
+        setCallState(prev => {
+            const contact = (prev.status !== 'idle' && prev.contact) ? prev.contact : {
                 name: newSession.remote_identity.display_name || remoteUri.user || 'Desconocido',
                 number: remoteUri.user || 'Desconocido',
-            },
-            isMuted: false,
-            isSpeaker: false,
-        }));
+            };
+            return {
+                status: 'in-call',
+                contact: contact,
+                isMuted: false,
+                isSpeaker: false,
+            }
+        });
     });
 
   }, []);
@@ -93,6 +96,7 @@ export const useSip = () => {
     }
 
     try {
+      JsSIP.debug.enable('JsSIP:*');
       const socket = new JsSIP.WebSocketInterface(sipInfo.server);
       const configuration: JsSIP.UAConfiguration = {
         sockets: [socket],
@@ -128,18 +132,14 @@ export const useSip = () => {
   const startCall = useCallback((number: string, contact?: Omit<Contact, 'id'>) => {
     if (ua && ua.isRegistered()) {
       const eventHandlers = {
-        'progress': (e: any) => console.log('call is in progress', e),
         'failed': (e: any) => {
-            console.log('call failed with cause: ', e.cause)
             setCallState({ status: 'idle' });
             sessionRef.current = null;
         },
         'ended': (e: any) => {
-            console.log('call ended with cause: ', e.cause)
             setCallState({ status: 'idle' });
             sessionRef.current = null;
         },
-        'confirmed': (e: any) => console.log('call confirmed', e),
       };
 
       const options = {
@@ -150,8 +150,8 @@ export const useSip = () => {
       const session = ua.call(`sip:${number}@${ua.configuration.uri.host}`, options);
       if (session) {
           sessionRef.current = session;
-          setCallState({
-              status: 'in-call', // Or maybe 'calling'
+           setCallState({
+              status: 'in-call',
               contact: contact || { name: number, number },
               isMuted: false,
               isSpeaker: false
@@ -173,5 +173,32 @@ export const useSip = () => {
     }
   }, []);
 
-  return { callState, connectionStatus, connect, disconnect, startCall, endCall, acceptCall };
+  const toggleMute = useCallback(() => {
+      if (sessionRef.current && callState.status === 'in-call') {
+          const isMuted = callState.isMuted;
+          if (isMuted) {
+              sessionRef.current.unmute({ audio: true });
+          } else {
+              sessionRef.current.mute({ audio: true });
+          }
+          setCallState(prev => prev.status === 'in-call' ? {...prev, isMuted: !isMuted} : prev);
+      }
+  }, [callState.status]);
+  
+  const toggleSpeaker = useCallback(() => {
+      if (callState.status === 'in-call') {
+          // Web API for speaker control is limited.
+          // This is mostly for UI state management.
+          setCallState(prev => prev.status === 'in-call' ? {...prev, isSpeaker: !prev.isSpeaker} : prev);
+      }
+  }, [callState.status]);
+
+  const sendDTMF = useCallback((tone: string) => {
+    if (sessionRef.current && callState.status === 'in-call') {
+        sessionRef.current.sendDTMF(tone);
+    }
+  }, [callState.status]);
+
+
+  return { callState, connectionStatus, connect, disconnect, startCall, endCall, acceptCall, toggleMute, toggleSpeaker, sendDTMF };
 };

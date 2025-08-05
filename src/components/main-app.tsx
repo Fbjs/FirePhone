@@ -36,7 +36,7 @@ export default function MainApp() {
   const { logout, user } = useAuth();
   const { toast } = useToast();
 
-  const { callState, connect, disconnect, startCall, endCall, acceptCall, connectionStatus } = useSip();
+  const { callState, connect, disconnect, startCall, endCall, acceptCall, toggleMute, toggleSpeaker, sendDTMF, connectionStatus } = useSip();
 
   const handleSaveSipSettings = (sipInfo: SipInfo) => {
     connect(sipInfo);
@@ -116,8 +116,9 @@ export default function MainApp() {
             <OngoingCall
               callState={callState}
               onHangup={handleEndCall}
-              onMuteToggle={() => {}} // Will be handled by useSip hook
-              onSpeakerToggle={() => {}} // Will be handled by useSip hook
+              onMuteToggle={toggleMute}
+              onSpeakerToggle={toggleSpeaker}
+              onSendDTMF={sendDTMF}
             />
           )}
           {callState.status === 'incoming' && (

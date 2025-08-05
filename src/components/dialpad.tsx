@@ -14,10 +14,11 @@ export function Dialpad({ onCall, showCallButton = true }: DialpadProps) {
   const [number, setNumber] = useState('');
 
   const handleKeyPress = (key: string) => {
-    setNumber((prev) => prev + key);
-    if (!showCallButton) {
-      // In-call DTMF tone simulation
-      console.log(`Sending DTMF tone: ${key}`);
+    if (showCallButton) {
+      setNumber((prev) => prev + key);
+    } else {
+      // In-call DTMF tone sending
+      onCall(key);
     }
   };
 
@@ -36,25 +37,27 @@ export function Dialpad({ onCall, showCallButton = true }: DialpadProps) {
   return (
     <div className="flex h-full flex-col items-center justify-between p-4 py-8">
       <div className="w-full max-w-xs space-y-4">
-        <div className="relative">
-          <Input
-            type="tel"
-            value={number}
-            onChange={(e) => setNumber(e.target.value)}
-            placeholder="Ingresar número"
-            className="h-14 text-center text-4xl font-light tracking-wider"
-          />
-          {number && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-2 top-1/2 -translate-y-1/2"
-              onClick={handleDelete}
-            >
-              <Delete className="h-6 w-6" />
-            </Button>
-          )}
-        </div>
+        {showCallButton && (
+            <div className="relative">
+            <Input
+                type="tel"
+                value={number}
+                onChange={(e) => setNumber(e.target.value)}
+                placeholder="Ingresar número"
+                className="h-14 text-center text-4xl font-light tracking-wider"
+            />
+            {number && (
+                <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-2 top-1/2 -translate-y-1/2"
+                onClick={handleDelete}
+                >
+                <Delete className="h-6 w-6" />
+                </Button>
+            )}
+            </div>
+        )}
       </div>
 
       <div className="grid w-full max-w-xs grid-cols-3 gap-2">

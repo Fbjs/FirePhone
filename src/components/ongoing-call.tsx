@@ -13,9 +13,10 @@ interface OngoingCallProps {
   onHangup: () => void;
   onMuteToggle: () => void;
   onSpeakerToggle: () => void;
+  onSendDTMF: (tone: string) => void;
 }
 
-export function OngoingCall({ callState, onHangup, onMuteToggle, onSpeakerToggle }: OngoingCallProps) {
+export function OngoingCall({ callState, onHangup, onMuteToggle, onSpeakerToggle, onSendDTMF }: OngoingCallProps) {
   const [duration, setDuration] = useState(0);
   const [showDialpad, setShowDialpad] = useState(false);
 
@@ -42,7 +43,7 @@ export function OngoingCall({ callState, onHangup, onMuteToggle, onSpeakerToggle
        {showDialpad ? (
         <div className="flex h-full w-full flex-col">
             <div className="flex-1">
-             <Dialpad onCall={() => {}} showCallButton={false} />
+             <Dialpad onCall={onSendDTMF} showCallButton={false} />
             </div>
             <div className="mx-auto w-full max-w-xs">
                  <Button onClick={() => setShowDialpad(false)} variant="outline" className="h-16 w-full rounded-full">
