@@ -27,51 +27,9 @@ export const useSip = () => {
     setConnectionStatus('disconnected');
   }, []);
 
-  const setupSessionEventHandlers = useCallback((session: JsSIP.RTCSession) => {
-    sessionRef.current = session;
-
-    session.on('ended', () => {
-      setCallState({ status: 'idle' });
-      sessionRef.current = null;
-    });
-
-    session.on('failed', () => {
-      setCallState({ status: 'idle' });
-      sessionRef.current = null;
-    });
-
-    session.on('accepted', () => {
-        const remoteUri = session.remote_identity.uri;
-        setCallState(prev => {
-            const contact = (prev.status !== 'idle' && prev.contact) ? prev.contact : {
-                name: session.remote_identity.display_name || remoteUri.user || 'Desconocido',
-                number: remoteUri.user || 'Desconocido',
-            };
-            return {
-                status: 'in-call',
-                contact: contact,
-                isMuted: false,
-                isSpeaker: false,
-            }
-        });
-    });
-
-    session.on('peerconnection', (data: { peerconnection: RTCPeerConnection }) => {
-        const peerconnection = data.peerconnection;
-        peerconnection.ontrack = (e) => {
-            const remoteAudio = document.getElementById('remote-audio') as HTMLAudioElement;
-            if (remoteAudio) {
-                remoteAudio.srcObject = e.streams[0];
-                remoteAudio.play().catch(error => console.error("Audio play failed:", error));
-            }
-        };
-    });
-
-  }, []);
-
   const handleNewRTCSession = useCallback((e: JsSIP.NewRTCSessionEvent) => {
     const newSession = e.session;
-    setupSessionEventHandlers(newSession);
+    sessionRef.current = newSession;
 
     if (newSession.direction === 'incoming') {
       const remoteUri = newSession.remote_identity.uri;
@@ -83,7 +41,45 @@ export const useSip = () => {
         },
       });
     }
-  }, [setupSessionEventHandlers]);
+
+    newSession.on('ended', () => {
+      setCallState({ status: 'idle' });
+      sessionRef.current = null;
+    });
+
+    newSession.on('failed', () => {
+      setCallState({ status: 'idle' });
+      sessionRef.current = null;
+    });
+    
+    newSession.on('peerconnection', (data: { peerconnection: RTCPeerConnection }) => {
+        const peerconnection = data.peerconnection;
+        peerconnection.ontrack = (e) => {
+            const remoteAudio = document.getElementById('remote-audio') as HTMLAudioElement;
+            if (remoteAudio) {
+                remoteAudio.srcObject = e.streams[0];
+                remoteAudio.play().catch(error => console.error("Audio play failed:", error));
+            }
+        };
+    });
+
+    newSession.on('accepted', () => {
+        const remoteUri = newSession.remote_identity.uri;
+        setCallState(prev => {
+            const contact = (prev.status !== 'idle' && prev.contact) ? prev.contact : {
+                name: newSession.remote_identity.display_name || remoteUri.user || 'Desconocido',
+                number: remoteUri.user || 'Desconocido',
+            };
+            return {
+                status: 'in-call',
+                contact: contact,
+                isMuted: false,
+                isSpeaker: false,
+            }
+        });
+    });
+
+  }, []);
 
   const handleRegistrationFailed = useCallback((e: JsSIP.RegistrationFailedEvent) => {
     console.error('SIP registration failed:', e.cause);
@@ -135,14 +131,46 @@ export const useSip = () => {
   
   const startCall = useCallback((number: string, contact?: Omit<Contact, 'id'>) => {
     if (ua && ua.isRegistered()) {
+      const eventHandlers = {
+        'failed': (e: any) => {
+            setCallState({ status: 'idle' });
+            sessionRef.current = null;
+        },
+        'ended': (e: any) => {
+            setCallState({ status: 'idle' });
+            sessionRef.current = null;
+        },
+        'accepted': (e: any) => {
+            const session = e.session as JsSIP.RTCSession;
+            const remoteUri = session.remote_identity.uri;
+            setCallState({
+                status: 'in-call',
+                contact: contact || { name: number, number },
+                isMuted: false,
+                isSpeaker: false
+            });
+        },
+        'peerconnection': (data: { peerconnection: RTCPeerConnection }) => {
+            const peerconnection = data.peerconnection;
+            peerconnection.ontrack = (e) => {
+                const remoteAudio = document.getElementById('remote-audio') as HTMLAudioElement;
+                if (remoteAudio) {
+                    remoteAudio.srcObject = e.streams[0];
+                    remoteAudio.play().catch(error => console.error("Audio play failed:", error));
+                }
+            };
+        }
+      };
+
       const options = {
+        'eventHandlers': eventHandlers,
         'mediaConstraints': { 'audio': true, 'video': false }
       };
 
       try {
         const session = ua.call(`sip:${number}@${ua.configuration.uri.host}`, options);
         if (session) {
-            setupSessionEventHandlers(session);
+            sessionRef.current = session;
              setCallState({
                 status: 'in-call',
                 contact: contact || { name: number, number },
@@ -154,7 +182,7 @@ export const useSip = () => {
           console.error("Call failed to start", e);
       }
     }
-  }, [setupSessionEventHandlers]);
+  }, []);
 
   const endCall = useCallback(() => {
     if (sessionRef.current && !sessionRef.current.isEnded()) {
@@ -177,7 +205,7 @@ export const useSip = () => {
           } else {
               sessionRef.current.mute({ audio: true });
           }
-          setCallState((prev) => (prev.status === 'in-call' ? { ...prev, isMuted: !isMuted } : prev));
+          setCallState(prev => prev.status === 'in-call' ? {...prev, isMuted: !isMuted} : prev);
       }
   }, [callState]);
   
