@@ -1,11 +1,10 @@
 'use client';
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import * as JsSIP from 'jssip';
 import type { CallState, Contact, SipInfo } from '@/types';
 
 type ConnectionStatus = 'disconnected' | 'connecting' | 'connected' | 'error';
 
-// Ensure we only have one UA instance
 let ua: JsSIP.UA | null = null;
 
 export const useSip = () => {
@@ -58,14 +57,8 @@ export const useSip = () => {
         peerconnection.ontrack = (e) => {
             const remoteAudio = document.getElementById('remote-audio') as HTMLAudioElement;
             if (remoteAudio) {
-                const stream = e.streams[0];
-                const audioTracks = stream.getAudioTracks();
-                if (audioTracks.length > 0) {
-                    const audioStream = new MediaStream();
-                    audioTracks.forEach(track => audioStream.addTrack(track));
-                    remoteAudio.srcObject = audioStream;
-                    remoteAudio.play().catch(error => console.error("Audio play failed:", error));
-                }
+                remoteAudio.srcObject = e.streams[0];
+                remoteAudio.play().catch(error => console.error("Audio play failed:", error));
             }
         };
     });
@@ -132,6 +125,7 @@ export const useSip = () => {
       ua.stop();
       ua = null;
       setConnectionStatus('disconnected');
+      setCallState({ status: 'idle' });
     }
   }, []);
   
@@ -153,15 +147,19 @@ export const useSip = () => {
         'mediaConstraints': { 'audio': true, 'video': false }
       };
 
-      const session = ua.call(`sip:${number}@${ua.configuration.uri.host}`, options);
-      if (session) {
-          sessionRef.current = session;
-           setCallState({
-              status: 'in-call',
-              contact: contact || { name: number, number },
-              isMuted: false,
-              isSpeaker: false
-          });
+      try {
+        const session = ua.call(`sip:${number}@${ua.configuration.uri.host}`, options);
+        if (session) {
+            sessionRef.current = session;
+             setCallState({
+                status: 'in-call',
+                contact: contact || { name: number, number },
+                isMuted: false,
+                isSpeaker: false
+            });
+        }
+      } catch (e) {
+          console.error("Call failed to start", e);
       }
     }
   }, []);
@@ -174,34 +172,39 @@ export const useSip = () => {
   }, []);
   
   const acceptCall = useCallback(() => {
-    if (sessionRef.current) {
+    if (sessionRef.current && sessionRef.current.direction === 'incoming') {
       sessionRef.current.answer({ mediaConstraints: { audio: true, video: false } });
     }
   }, []);
 
   const toggleMute = useCallback(() => {
-      if (sessionRef.current && callState.status === 'in-call') {
-          const isMuted = callState.isMuted;
-          if (isMuted) {
-              sessionRef.current.unmute({ audio: true });
-          } else {
-              sessionRef.current.mute({ audio: true });
-          }
-          setCallState(prev => prev.status === 'in-call' ? {...prev, isMuted: !isMuted} : prev);
+    if (sessionRef.current && callState.status === 'in-call') {
+      const isMuted = callState.isMuted;
+      if (isMuted) {
+        sessionRef.current.unmute({ audio: true });
+      } else {
+        sessionRef.current.mute({ audio: true });
       }
+      setCallState((prev) => (prev.status === 'in-call' ? { ...prev, isMuted: !isMuted } : prev));
+    }
   }, [callState]);
   
   const toggleSpeaker = useCallback(() => {
       if (callState.status === 'in-call') {
           // Web API for speaker control is limited.
           // This is mostly for UI state management.
+          console.log("Speaker toggle is a UI-only feature in this example.");
           setCallState(prev => prev.status === 'in-call' ? {...prev, isSpeaker: !prev.isSpeaker} : prev);
       }
   }, [callState]);
 
   const sendDTMF = useCallback((tone: string) => {
     if (sessionRef.current && callState.status === 'in-call') {
-        sessionRef.current.sendDTMF(tone);
+        try {
+            sessionRef.current.sendDTMF(tone);
+        } catch(e) {
+            console.error("Failed to send DTMF tone", e);
+        }
     }
   }, [callState.status]);
 
