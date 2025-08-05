@@ -94,43 +94,45 @@ export default function MainApp() {
 
   return (
     <>
-      <div className="relative h-screen w-full overflow-hidden bg-background">
-        <div className="flex h-full flex-col pb-20">
-          {activeTab === 'dialpad' && <Dialpad onCall={handleStartCall} />}
-          {activeTab === 'history' && <CallHistory onCall={handleStartCall} />}
-          {activeTab === 'contacts' && <ContactList contacts={contacts} onEdit={handleOpenForm} onAdd={() => handleOpenForm()} onCall={handleStartCall} />}
-          {activeTab === 'settings' && (
-             <div className="flex h-full flex-col items-center justify-center p-4">
-                <User className="h-24 w-24 text-muted-foreground" />
-                <p className="mt-4 text-lg font-medium">{user?.email}</p>
-                <p className="text-muted-foreground">Ajustes próximamente</p>
-                <Button onClick={handleSimulateIncomingCall} className="mt-8">
-                    Simular Llamada Entrante
-                </Button>
-                <Button variant="link" onClick={logout} className="mt-4 text-destructive">
-                  Cerrar Sesión
-                </Button>
-             </div>
+      <div className="flex h-screen w-full justify-center bg-background">
+        <div className="relative h-full w-full max-w-md border-x bg-background md:shadow-lg">
+          <div className="flex h-full flex-col pb-20">
+            {activeTab === 'dialpad' && <Dialpad onCall={handleStartCall} />}
+            {activeTab === 'history' && <CallHistory onCall={handleStartCall} />}
+            {activeTab === 'contacts' && <ContactList contacts={contacts} onEdit={handleOpenForm} onAdd={() => handleOpenForm()} onCall={handleStartCall} />}
+            {activeTab === 'settings' && (
+              <div className="flex h-full flex-col items-center justify-center p-4">
+                  <User className="h-24 w-24 text-muted-foreground" />
+                  <p className="mt-4 text-lg font-medium">{user?.email}</p>
+                  <p className="text-muted-foreground">Ajustes próximamente</p>
+                  <Button onClick={handleSimulateIncomingCall} className="mt-8">
+                      Simular Llamada Entrante
+                  </Button>
+                  <Button variant="link" onClick={logout} className="mt-4 text-destructive">
+                    Cerrar Sesión
+                  </Button>
+              </div>
+            )}
+          </div>
+
+          <BottomNav items={navItems} activeTab={activeTab} setActiveTab={setActiveTab} />
+          
+          {callState.status === 'in-call' && (
+            <OngoingCall
+              callState={callState}
+              onHangup={handleEndCall}
+              onMuteToggle={() => setCallState(prev => prev.status === 'in-call' ? {...prev, isMuted: !prev.isMuted} : prev)}
+              onSpeakerToggle={() => setCallState(prev => prev.status === 'in-call' ? {...prev, isSpeaker: !prev.isSpeaker} : prev)}
+            />
+          )}
+          {callState.status === 'incoming' && (
+            <IncomingCall
+              caller={callState.contact}
+              onAccept={handleAcceptCall}
+              onDecline={handleEndCall}
+            />
           )}
         </div>
-
-        <BottomNav items={navItems} activeTab={activeTab} setActiveTab={setActiveTab} />
-        
-        {callState.status === 'in-call' && (
-          <OngoingCall
-            callState={callState}
-            onHangup={handleEndCall}
-            onMuteToggle={() => setCallState(prev => prev.status === 'in-call' ? {...prev, isMuted: !prev.isMuted} : prev)}
-            onSpeakerToggle={() => setCallState(prev => prev.status === 'in-call' ? {...prev, isSpeaker: !prev.isSpeaker} : prev)}
-          />
-        )}
-        {callState.status === 'incoming' && (
-          <IncomingCall
-            caller={callState.contact}
-            onAccept={handleAcceptCall}
-            onDecline={handleEndCall}
-          />
-        )}
       </div>
       <ContactForm
         isOpen={isFormOpen}

@@ -38,14 +38,14 @@ export function OngoingCall({ callState, onHangup, onMuteToggle, onSpeakerToggle
   const { contact, isMuted, isSpeaker } = callState;
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col items-center justify-between bg-background p-8">
+    <div className="absolute inset-0 z-50 flex flex-col items-center justify-between bg-background p-8">
        {showDialpad ? (
         <div className="flex h-full w-full flex-col">
             <div className="flex-1">
              <Dialpad onCall={() => {}} showCallButton={false} />
             </div>
-            <div className="w-full max-w-xs">
-                 <Button onClick={() => setShowDialpad(false)} variant="outline" className="w-full h-16 rounded-full">
+            <div className="mx-auto w-full max-w-xs">
+                 <Button onClick={() => setShowDialpad(false)} variant="outline" className="h-16 w-full rounded-full">
                     <ChevronLeft className="h-7 w-7" />
                     Volver a la llamada
                 </Button>
@@ -53,7 +53,7 @@ export function OngoingCall({ callState, onHangup, onMuteToggle, onSpeakerToggle
         </div>
       ) : (
       <>
-      <div className="flex flex-col items-center pt-20 text-center text-foreground">
+      <div className="flex flex-col items-center pt-16 text-center text-foreground">
         <Avatar className="h-32 w-32 border-4 border-white shadow-lg">
           <AvatarImage src={contact.avatarUrl} alt={contact.name} data-ai-hint="person" />
           <AvatarFallback className="text-5xl">
@@ -65,38 +65,38 @@ export function OngoingCall({ callState, onHangup, onMuteToggle, onSpeakerToggle
       </div>
 
       <div className="grid w-full max-w-xs grid-cols-3 gap-4">
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center gap-2">
             <Button
               size="icon"
               variant="outline"
-              className={cn("h-16 w-16 rounded-full", isMuted && 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground')}
+              className={cn("h-16 w-16 rounded-full bg-black/5 text-foreground hover:bg-black/10", isMuted && 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground')}
               onClick={onMuteToggle}
             >
               {isMuted ? <MicOff className="h-7 w-7" /> : <Mic className="h-7 w-7" />}
             </Button>
-            <span className="mt-2 text-sm text-foreground">Silenciar</span>
+            <span className="text-sm text-foreground">Silenciar</span>
         </div>
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center gap-2">
              <Button
                 size="icon"
                 variant="outline"
-                className="h-16 w-16 rounded-full"
+                className="h-16 w-16 rounded-full bg-black/5 text-foreground hover:bg-black/10"
                 onClick={() => setShowDialpad(true)}
              >
                 <Grid3x3 className="h-7 w-7" />
              </Button>
-             <span className="mt-2 text-sm text-foreground">Teclado</span>
+             <span className="text-sm text-foreground">Teclado</span>
         </div>
-        <div className="flex flex-col items-center">
+        <div className="flex flex-col items-center gap-2">
             <Button
               size="icon"
               variant="outline"
-              className={cn("h-16 w-16 rounded-full", isSpeaker && 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground')}
+              className={cn("h-16 w-16 rounded-full bg-black/5 text-foreground hover:bg-black/10", isSpeaker && 'bg-primary text-primary-foreground hover:bg-primary/90 hover:text-primary-foreground')}
               onClick={onSpeakerToggle}
             >
               {isSpeaker ? <VolumeX className="h-7 w-7" /> : <Volume2 className="h-7 w-7" />}
             </Button>
-            <span className="mt-2 text-sm text-foreground">Altavoz</span>
+            <span className="text-sm text-foreground">Altavoz</span>
         </div>
       </div>
 

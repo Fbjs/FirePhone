@@ -18,7 +18,7 @@ interface BottomNavProps {
 
 export function BottomNav({ items, activeTab, setActiveTab }: BottomNavProps) {
   return (
-    <div className="fixed bottom-0 left-0 right-0 border-t bg-card">
+    <div className="absolute bottom-0 left-0 right-0 border-t bg-card">
       <div className="flex h-20 items-center justify-around">
         {items.map((item) => (
           <button

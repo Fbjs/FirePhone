@@ -34,7 +34,7 @@ export function Dialpad({ onCall, showCallButton = true }: DialpadProps) {
   const dialpadKeys = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '*', '0', '#'];
 
   return (
-    <div className="flex h-full flex-col items-center justify-between p-4">
+    <div className="flex h-full flex-col items-center justify-between p-4 py-8">
       <div className="w-full max-w-xs space-y-4">
         <div className="relative">
           <Input
@@ -42,7 +42,7 @@ export function Dialpad({ onCall, showCallButton = true }: DialpadProps) {
             value={number}
             onChange={(e) => setNumber(e.target.value)}
             placeholder="Ingresar número"
-            className="h-14 text-center text-3xl font-light tracking-wider"
+            className="h-14 text-center text-4xl font-light tracking-wider"
           />
           {number && (
             <Button
@@ -62,7 +62,7 @@ export function Dialpad({ onCall, showCallButton = true }: DialpadProps) {
           <Button
             key={key}
             variant="outline"
-            className="h-20 rounded-full text-2xl font-light"
+            className="h-20 rounded-full text-3xl font-light"
             onClick={() => handleKeyPress(key)}
           >
             {key}
