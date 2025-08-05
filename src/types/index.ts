@@ -6,7 +6,8 @@ export interface Call {
   duration: string;
 }
 
-interface Contact {
+export interface Contact {
+  id: string;
   name: string;
   number: string;
   avatarUrl?: string;
@@ -18,14 +19,14 @@ export interface IdleState {
 
 export interface InCallState {
   status: 'in-call';
-  contact: Contact;
+  contact: Omit<Contact, 'id'>;
   isMuted: boolean;
   isSpeaker: boolean;
 }
 
 export interface IncomingState {
   status: 'incoming';
-  contact: Contact;
+  contact: Omit<Contact, 'id'>;
 }
 
 export type CallState = IdleState | InCallState | IncomingState;
