@@ -5,7 +5,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Card, CardContent } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import { Search, Edit, Plus } from 'lucide-react';
+import { Search, Edit, Plus, Phone } from 'lucide-react';
 import type { Contact } from '@/types';
 import { Button } from './ui/button';
 
@@ -13,9 +13,10 @@ interface ContactListProps {
   contacts: Contact[];
   onEdit: (contact: Contact) => void;
   onAdd: () => void;
+  onCall: (number: string) => void;
 }
 
-export function ContactList({ contacts, onEdit, onAdd }: ContactListProps) {
+export function ContactList({ contacts, onEdit, onAdd, onCall }: ContactListProps) {
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredContacts = useMemo(() => {
@@ -56,7 +57,7 @@ export function ContactList({ contacts, onEdit, onAdd }: ContactListProps) {
         <div className="space-y-2">
           {filteredContacts.map((contact) => (
             <Card key={contact.id} className="overflow-hidden">
-              <CardContent className="flex items-center gap-4 p-3">
+              <CardContent className="flex items-center gap-2 p-3">
                 <Avatar className="h-12 w-12">
                   <AvatarImage src={contact.avatarUrl} alt={contact.name} data-ai-hint="person portrait" />
                   <AvatarFallback>{contact.name.charAt(0)}</AvatarFallback>
@@ -65,6 +66,10 @@ export function ContactList({ contacts, onEdit, onAdd }: ContactListProps) {
                   <p className="font-semibold">{contact.name}</p>
                   <p className="text-sm text-muted-foreground">{contact.number}</p>
                 </div>
+                <Button variant="ghost" size="icon" onClick={() => onCall(contact.number)}>
+                    <Phone className="h-5 w-5 text-muted-foreground" />
+                    <span className="sr-only">Llamar</span>
+                </Button>
                 <Button variant="ghost" size="icon" onClick={() => onEdit(contact)}>
                     <Edit className="h-5 w-5 text-muted-foreground" />
                     <span className="sr-only">Editar</span>

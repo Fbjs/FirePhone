@@ -2,6 +2,7 @@ export interface Call {
   id: string;
   type: 'incoming' | 'outgoing' | 'missed';
   contact: string;
+  number: string;
   time: string;
   duration: string;
 }

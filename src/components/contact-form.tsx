@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -17,7 +17,7 @@ import {
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import type { Contact } from '@/types';
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar';
-import { User } from 'lucide-react';
+import { Camera, User } from 'lucide-react';
 
 const contactSchema = z.object({
   id: z.string().optional(),
@@ -45,6 +45,7 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
       avatarUrl: '',
     },
   });
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (contact) {
@@ -70,6 +71,17 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
     onClose();
   };
 
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        form.setValue('avatarUrl', reader.result as string, { shouldValidate: true });
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const avatarUrl = form.watch('avatarUrl');
 
   return (
@@ -86,12 +98,31 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <div className="flex justify-center">
-              <Avatar className="h-24 w-24">
-                <AvatarImage src={avatarUrl} alt="Avatar de contacto" />
-                <AvatarFallback>
-                  <User className="h-12 w-12 text-muted-foreground" />
-                </AvatarFallback>
-              </Avatar>
+              <div className="relative">
+                <Avatar className="h-24 w-24">
+                  <AvatarImage src={avatarUrl} alt="Avatar de contacto" />
+                  <AvatarFallback>
+                    <User className="h-12 w-12 text-muted-foreground" />
+                  </AvatarFallback>
+                </Avatar>
+                <Button
+                    type="button"
+                    size="icon"
+                    className="absolute bottom-0 right-0 rounded-full"
+                    onClick={() => fileInputRef.current?.click()}
+                >
+                    <Camera className="h-5 w-5" />
+                </Button>
+                <FormControl>
+                    <Input
+                        type="file"
+                        className="hidden"
+                        ref={fileInputRef}
+                        onChange={handleImageUpload}
+                        accept="image/*"
+                    />
+                </FormControl>
+              </div>
             </div>
             <FormField
               control={form.control}
@@ -119,14 +150,14 @@ export function ContactForm({ isOpen, onClose, onSave, contact }: ContactFormPro
                 </FormItem>
               )}
             />
-            <FormField
+             <FormField
               control={form.control}
               name="avatarUrl"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="hidden">
                   <FormLabel>URL del Avatar (Opcional)</FormLabel>
                   <FormControl>
-                    <Input placeholder="https://placehold.co/100x100.png" {...field} />
+                    <Input {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

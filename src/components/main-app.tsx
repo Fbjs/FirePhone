@@ -33,9 +33,10 @@ export default function MainApp() {
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
 
   const handleStartCall = (number: string) => {
+    const contact = contacts.find(c => c.number === number) || { name: number, number };
     setCallState({
       status: 'in-call',
-      contact: { name: number, number },
+      contact: contact,
       isMuted: false,
       isSpeaker: false,
     });
@@ -48,7 +49,7 @@ export default function MainApp() {
   const handleSimulateIncomingCall = () => {
     setCallState({
       status: 'incoming',
-      contact: { name: 'Jane Doe', number: '(987) 654-3210' },
+      contact: { name: 'Jane Doe', number: '(987) 654-3210', avatarUrl: 'https://placehold.co/100x100.png' },
     });
   };
   
@@ -96,8 +97,8 @@ export default function MainApp() {
       <div className="relative h-screen w-full overflow-hidden bg-background">
         <div className="flex h-full flex-col pb-20">
           {activeTab === 'dialpad' && <Dialpad onCall={handleStartCall} />}
-          {activeTab === 'history' && <CallHistory />}
-          {activeTab === 'contacts' && <ContactList contacts={contacts} onEdit={handleOpenForm} onAdd={() => handleOpenForm()} />}
+          {activeTab === 'history' && <CallHistory onCall={handleStartCall} />}
+          {activeTab === 'contacts' && <ContactList contacts={contacts} onEdit={handleOpenForm} onAdd={() => handleOpenForm()} onCall={handleStartCall} />}
           {activeTab === 'settings' && (
              <div className="flex h-full flex-col items-center justify-center p-4">
                 <User className="h-24 w-24 text-muted-foreground" />
