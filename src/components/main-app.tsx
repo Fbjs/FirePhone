@@ -1,17 +1,20 @@
 'use client';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Dialpad } from './dialpad';
 import { CallHistory } from './call-history';
 import { BookUser, Clock, Phone, Settings, User } from 'lucide-react';
 import { BottomNav } from './bottom-nav';
-import type { CallState, Contact } from '@/types';
+import type { CallState, Contact, SipInfo } from '@/types';
 import { OngoingCall } from './ongoing-call';
 import { IncomingCall } from './incoming-call';
 import { useAuth } from '@/lib/auth';
 import { Button } from './ui/button';
 import { ContactList } from './contact-list';
 import { ContactForm } from './contact-form';
+import { useSip } from '@/hooks/useSip';
+import { SipSettings } from './sip-settings';
+import { useToast } from '@/hooks/use-toast';
 
 const initialContacts: Contact[] = [
     { id: '1', name: 'Juan Pérez', number: '555-0101', avatarUrl: 'https://placehold.co/100x100.png' },
@@ -26,42 +29,38 @@ const initialContacts: Contact[] = [
 
 export default function MainApp() {
   const [activeTab, setActiveTab] = useState('dialpad');
-  const [callState, setCallState] = useState<CallState>({ status: 'idle' });
-  const { logout, user } = useAuth();
   const [contacts, setContacts] = useState<Contact[]>(initialContacts);
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingContact, setEditingContact] = useState<Contact | null>(null);
+  
+  const { logout, user } = useAuth();
+  const { toast } = useToast();
 
+  const { callState, connect, disconnect, startCall, endCall, acceptCall, connectionStatus } = useSip();
+
+  const handleSaveSipSettings = (sipInfo: SipInfo) => {
+    connect(sipInfo);
+  };
+  
   const handleStartCall = (number: string) => {
+    if (connectionStatus !== 'connected') {
+      toast({
+        title: 'Error de Conexión',
+        description: 'Por favor, conecta tu cuenta SIP en Ajustes.',
+        variant: 'destructive',
+      });
+      return;
+    }
     const contact = contacts.find(c => c.number === number) || { name: number, number };
-    setCallState({
-      status: 'in-call',
-      contact: contact,
-      isMuted: false,
-      isSpeaker: false,
-    });
+    startCall(number, contact);
   };
   
   const handleEndCall = () => {
-    setCallState({ status: 'idle' });
-  };
-  
-  const handleSimulateIncomingCall = () => {
-    setCallState({
-      status: 'incoming',
-      contact: { name: 'Jane Doe', number: '(987) 654-3210', avatarUrl: 'https://placehold.co/100x100.png' },
-    });
+    endCall();
   };
   
   const handleAcceptCall = () => {
-    if (callState.status === 'incoming') {
-      setCallState({
-        status: 'in-call',
-        contact: callState.contact,
-        isMuted: false,
-        isSpeaker: false,
-      });
-    }
+    acceptCall();
   };
 
   const handleOpenForm = (contact: Contact | null = null) => {
@@ -101,17 +100,13 @@ export default function MainApp() {
             {activeTab === 'history' && <CallHistory onCall={handleStartCall} />}
             {activeTab === 'contacts' && <ContactList contacts={contacts} onEdit={handleOpenForm} onAdd={() => handleOpenForm()} onCall={handleStartCall} />}
             {activeTab === 'settings' && (
-              <div className="flex h-full flex-col items-center justify-center p-4">
-                  <User className="h-24 w-24 text-muted-foreground" />
-                  <p className="mt-4 text-lg font-medium">{user?.email}</p>
-                  <p className="text-muted-foreground">Ajustes próximamente</p>
-                  <Button onClick={handleSimulateIncomingCall} className="mt-8">
-                      Simular Llamada Entrante
-                  </Button>
-                  <Button variant="link" onClick={logout} className="mt-4 text-destructive">
-                    Cerrar Sesión
-                  </Button>
-              </div>
+              <SipSettings
+                onSave={handleSaveSipSettings}
+                onDisconnect={disconnect}
+                connectionStatus={connectionStatus}
+                user={user}
+                onLogout={logout}
+              />
             )}
           </div>
 
@@ -121,8 +116,8 @@ export default function MainApp() {
             <OngoingCall
               callState={callState}
               onHangup={handleEndCall}
-              onMuteToggle={() => setCallState(prev => prev.status === 'in-call' ? {...prev, isMuted: !prev.isMuted} : prev)}
-              onSpeakerToggle={() => setCallState(prev => prev.status === 'in-call' ? {...prev, isSpeaker: !prev.isSpeaker} : prev)}
+              onMuteToggle={() => {}} // Will be handled by useSip hook
+              onSpeakerToggle={() => {}} // Will be handled by useSip hook
             />
           )}
           {callState.status === 'incoming' && (
@@ -140,6 +135,7 @@ export default function MainApp() {
         onSave={handleSaveContact}
         contact={editingContact}
       />
+      <audio id="remote-audio" autoPlay />
     </>
   );
 }

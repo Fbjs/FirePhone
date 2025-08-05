@@ -31,3 +31,9 @@ export interface IncomingState {
 }
 
 export type CallState = IdleState | InCallState | IncomingState;
+
+export interface SipInfo {
+    uri: string;
+    server: string;
+    password?: string;
+}
