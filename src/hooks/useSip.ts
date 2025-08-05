@@ -52,6 +52,17 @@ export const useSip = () => {
       setCallState({ status: 'idle' });
       sessionRef.current = null;
     });
+    
+    newSession.on('peerconnection', (data: { peerconnection: RTCPeerConnection }) => {
+        const peerconnection = data.peerconnection;
+        peerconnection.addEventListener('track', (e) => {
+            const remoteAudio = document.getElementById('remote-audio') as HTMLAudioElement;
+            if (remoteAudio && e.streams[0]) {
+                remoteAudio.srcObject = e.streams[0];
+                remoteAudio.play().catch(error => console.error("Audio play failed:", error));
+            }
+        });
+    });
 
     newSession.on('accepted', () => {
         const remoteUri = newSession.remote_identity.uri;
@@ -64,15 +75,6 @@ export const useSip = () => {
             isMuted: false,
             isSpeaker: false,
         }));
-        
-        // Attach the remote audio stream when the call is accepted.
-        newSession.connection.addEventListener('track', (e) => {
-            const remoteAudio = document.getElementById('remote-audio') as HTMLAudioElement;
-            if (remoteAudio) {
-                remoteAudio.srcObject = e.streams[0];
-                remoteAudio.play().catch(error => console.error("Audio play failed:", error));
-            }
-        });
     });
 
   }, []);
