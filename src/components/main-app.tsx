@@ -3,13 +3,14 @@
 import { useState } from 'react';
 import { Dialpad } from './dialpad';
 import { CallHistory } from './call-history';
-import { Clock, Phone, Settings, User } from 'lucide-react';
+import { BookUser, Clock, Phone, Settings, User } from 'lucide-react';
 import { BottomNav } from './bottom-nav';
 import type { CallState } from '@/types';
 import { OngoingCall } from './ongoing-call';
 import { IncomingCall } from './incoming-call';
 import { useAuth } from '@/lib/auth';
 import { Button } from './ui/button';
+import { ContactList } from './contact-list';
 
 export default function MainApp() {
   const [activeTab, setActiveTab] = useState('dialpad');
@@ -49,6 +50,7 @@ export default function MainApp() {
 
   const navItems = [
     { id: 'history', label: 'Historial', icon: Clock },
+    { id: 'contacts', label: 'Contactos', icon: BookUser },
     { id: 'dialpad', label: 'Teclado', icon: Phone },
     { id: 'settings', label: 'Ajustes', icon: Settings },
   ];
@@ -58,6 +60,7 @@ export default function MainApp() {
       <div className="flex h-full flex-col pb-20">
         {activeTab === 'dialpad' && <Dialpad onCall={handleStartCall} />}
         {activeTab === 'history' && <CallHistory />}
+        {activeTab === 'contacts' && <ContactList />}
         {activeTab === 'settings' && (
            <div className="flex h-full flex-col items-center justify-center p-4">
               <User className="h-24 w-24 text-muted-foreground" />
