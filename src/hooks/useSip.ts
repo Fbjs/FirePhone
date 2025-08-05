@@ -183,7 +183,7 @@ export const useSip = () => {
           }
           setCallState(prev => prev.status === 'in-call' ? {...prev, isMuted: !isMuted} : prev);
       }
-  }, [callState.status]);
+  }, [callState]);
   
   const toggleSpeaker = useCallback(() => {
       if (callState.status === 'in-call') {
@@ -191,7 +191,7 @@ export const useSip = () => {
           // This is mostly for UI state management.
           setCallState(prev => prev.status === 'in-call' ? {...prev, isSpeaker: !prev.isSpeaker} : prev);
       }
-  }, [callState.status]);
+  }, [callState]);
 
   const sendDTMF = useCallback((tone: string) => {
     if (sessionRef.current && callState.status === 'in-call') {
