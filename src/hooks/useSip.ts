@@ -55,13 +55,19 @@ export const useSip = () => {
     
     newSession.on('peerconnection', (data: { peerconnection: RTCPeerConnection }) => {
         const peerconnection = data.peerconnection;
-        peerconnection.addEventListener('track', (e) => {
+        peerconnection.ontrack = (e) => {
             const remoteAudio = document.getElementById('remote-audio') as HTMLAudioElement;
-            if (remoteAudio && e.streams[0]) {
-                remoteAudio.srcObject = e.streams[0];
-                remoteAudio.play().catch(error => console.error("Audio play failed:", error));
+            if (remoteAudio) {
+                const stream = e.streams[0];
+                const audioTracks = stream.getAudioTracks();
+                if (audioTracks.length > 0) {
+                    const audioStream = new MediaStream();
+                    audioTracks.forEach(track => audioStream.addTrack(track));
+                    remoteAudio.srcObject = audioStream;
+                    remoteAudio.play().catch(error => console.error("Audio play failed:", error));
+                }
             }
-        });
+        };
     });
 
     newSession.on('accepted', () => {
