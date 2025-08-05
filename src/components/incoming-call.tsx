@@ -18,7 +18,7 @@ export function IncomingCall({ caller, onAccept, onDecline }: IncomingCallProps)
   return (
     <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-background/80 backdrop-blur-sm">
       <div className="flex flex-col items-center justify-center text-center text-foreground">
-        <p className="mb-4 text-lg text-muted-foreground">Incoming Call</p>
+        <p className="mb-4 text-lg text-muted-foreground">Llamada Entrante</p>
         <Avatar className="h-28 w-28 border-4 border-white shadow-lg">
           <AvatarImage src={caller.avatarUrl} alt={caller.name} data-ai-hint="person portrait" />
           <AvatarFallback className="text-4xl">
@@ -37,7 +37,7 @@ export function IncomingCall({ caller, onAccept, onDecline }: IncomingCallProps)
           >
             <PhoneOff className="h-8 w-8" />
           </Button>
-          <span className="text-foreground">Decline</span>
+          <span className="text-foreground">Rechazar</span>
         </div>
         <div className="flex flex-col items-center gap-2">
           <Button
@@ -47,7 +47,7 @@ export function IncomingCall({ caller, onAccept, onDecline }: IncomingCallProps)
           >
             <Phone className="h-8 w-8" />
           </Button>
-          <span className="text-foreground">Accept</span>
+          <span className="text-foreground">Aceptar</span>
         </div>
       </div>
     </div>

@@ -58,7 +58,7 @@ export function OngoingCall({ callState, onHangup, onMuteToggle, onSpeakerToggle
             >
               {isMuted ? <MicOff className="h-7 w-7" /> : <Mic className="h-7 w-7" />}
             </Button>
-            <span className="mt-2 text-sm text-foreground">Mute</span>
+            <span className="mt-2 text-sm text-foreground">Silenciar</span>
         </div>
         <div className="flex flex-col items-center">
             <Button
@@ -78,7 +78,7 @@ export function OngoingCall({ callState, onHangup, onMuteToggle, onSpeakerToggle
             >
               {isSpeaker ? <VolumeX className="h-7 w-7" /> : <Volume2 className="h-7 w-7" />}
             </Button>
-            <span className="mt-2 text-sm text-foreground">Speaker</span>
+            <span className="mt-2 text-sm text-foreground">Altavoz</span>
         </div>
       </div>
 

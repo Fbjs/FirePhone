@@ -36,7 +36,7 @@ export function Dialpad({ onCall }: DialpadProps) {
             type="tel"
             value={number}
             readOnly
-            placeholder="Enter number"
+            placeholder="Ingresar número"
             className="h-14 text-center text-3xl font-light tracking-wider"
           />
           {number && (

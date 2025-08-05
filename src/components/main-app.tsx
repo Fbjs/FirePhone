@@ -48,9 +48,9 @@ export default function MainApp() {
   };
 
   const navItems = [
-    { id: 'history', label: 'History', icon: Clock },
-    { id: 'dialpad', label: 'Dialpad', icon: Phone },
-    { id: 'settings', label: 'Settings', icon: Settings },
+    { id: 'history', label: 'Historial', icon: Clock },
+    { id: 'dialpad', label: 'Teclado', icon: Phone },
+    { id: 'settings', label: 'Ajustes', icon: Settings },
   ];
 
   return (
@@ -62,12 +62,12 @@ export default function MainApp() {
            <div className="flex h-full flex-col items-center justify-center p-4">
               <User className="h-24 w-24 text-muted-foreground" />
               <p className="mt-4 text-lg font-medium">{user?.email}</p>
-              <p className="text-muted-foreground">Settings coming soon</p>
+              <p className="text-muted-foreground">Ajustes próximamente</p>
               <Button onClick={handleSimulateIncomingCall} className="mt-8">
-                  Simulate Incoming Call
+                  Simular Llamada Entrante
               </Button>
               <Button variant="link" onClick={logout} className="mt-4 text-destructive">
-                Logout
+                Cerrar Sesión
               </Button>
            </div>
         )}

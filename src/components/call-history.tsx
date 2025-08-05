@@ -10,11 +10,11 @@ import { cn } from '@/lib/utils';
 const callHistory: Call[] = [
   { id: '1', type: 'outgoing', contact: 'John Doe', time: '10:45 AM', duration: '5m 32s' },
   { id: '2', type: 'incoming', contact: 'Jane Smith', time: '9:30 AM', duration: '2m 11s' },
-  { id: '3', type: 'missed', contact: '(123) 456-7890', time: 'Yesterday', duration: '0m 0s' },
-  { id: '4', type: 'outgoing', contact: 'Mom', time: 'Yesterday', duration: '15m 3s' },
-  { id: '5', type: 'incoming', contact: 'Work', time: '2 days ago', duration: '30s' },
-  { id: '6', type: 'missed', contact: 'Unknown', time: '2 days ago', duration: '0m 0s' },
-  { id: '7', type: 'outgoing', contact: 'Dr. Office', time: '2 days ago', duration: '1m 20s' },
+  { id: '3', type: 'missed', contact: '(123) 456-7890', time: 'Ayer', duration: '0m 0s' },
+  { id: '4', type: 'outgoing', contact: 'Mamá', time: 'Ayer', duration: '15m 3s' },
+  { id: '5', type: 'incoming', contact: 'Trabajo', time: 'Hace 2 días', duration: '30s' },
+  { id: '6', type: 'missed', contact: 'Desconocido', time: 'Hace 2 días', duration: '0m 0s' },
+  { id: '7', type: 'outgoing', contact: 'Consultorio', time: 'Hace 2 días', duration: '1m 20s' },
 ];
 
 const CallIcon: FC<{ type: Call['type'] }> = ({ type }) => {
@@ -34,8 +34,8 @@ export function CallHistory() {
   return (
     <div className="flex h-full flex-col">
        <div className="p-4 pb-0">
-         <h2 className="text-2xl font-bold tracking-tight">Call History</h2>
-         <p className="text-muted-foreground">View your recent calls.</p>
+         <h2 className="text-2xl font-bold tracking-tight">Historial de Llamadas</h2>
+         <p className="text-muted-foreground">Consulta tus llamadas recientes.</p>
        </div>
       <ScrollArea className="flex-1 p-4">
         <div className="space-y-3">

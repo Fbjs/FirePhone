@@ -9,8 +9,8 @@ export default function LoginPage() {
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-full bg-primary">
             <Phone className="h-8 w-8 text-primary-foreground" />
           </div>
-          <h1 className="text-3xl font-bold text-foreground">CommunicateEasy</h1>
-          <p className="text-muted-foreground">Your conversations, simplified.</p>
+          <h1 className="text-3xl font-bold text-foreground">FirePhone</h1>
+          <p className="text-muted-foreground">Tus conversaciones, simplificadas.</p>
         </div>
         <AuthForm />
       </div>
