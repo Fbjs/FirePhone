@@ -1,15 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { Dialpad } from './dialpad';
 import { CallHistory } from './call-history';
-import { BookUser, Clock, Phone, Settings, User } from 'lucide-react';
+import { BookUser, Clock, Phone, Settings } from 'lucide-react';
 import { BottomNav } from './bottom-nav';
-import type { CallState, Contact, SipInfo } from '@/types';
+import type { Contact, SipInfo } from '@/types';
 import { OngoingCall } from './ongoing-call';
 import { IncomingCall } from './incoming-call';
 import { useAuth } from '@/lib/auth';
-import { Button } from './ui/button';
 import { ContactList } from './contact-list';
 import { ContactForm } from './contact-form';
 import { useSip } from '@/hooks/useSip';
@@ -37,6 +36,18 @@ export default function MainApp() {
   const { toast } = useToast();
 
   const { callState, connect, disconnect, startCall, endCall, acceptCall, toggleMute, toggleSpeaker, sendDTMF, connectionStatus } = useSip();
+
+  const ringtoneRef = useRef<HTMLAudioElement>(null);
+
+  useEffect(() => {
+    if (callState.status === 'incoming' && ringtoneRef.current) {
+        ringtoneRef.current.play().catch(console.error);
+    } else if (ringtoneRef.current) {
+        ringtoneRef.current.pause();
+        ringtoneRef.current.currentTime = 0;
+    }
+  }, [callState.status]);
+
 
   const handleSaveSipSettings = (sipInfo: SipInfo) => {
     connect(sipInfo);
@@ -95,7 +106,7 @@ export default function MainApp() {
     <>
       <div className="flex h-screen w-full justify-center bg-background">
         <div className="relative h-full w-full max-w-md border-x bg-background md:shadow-lg">
-          <div className="flex h-full flex-col pb-20">
+          <main className="h-full pb-20">
             {activeTab === 'dialpad' && <Dialpad onCall={handleStartCall} />}
             {activeTab === 'history' && <CallHistory onCall={handleStartCall} />}
             {activeTab === 'contacts' && <ContactList contacts={contacts} onEdit={handleOpenForm} onAdd={() => handleOpenForm()} onCall={handleStartCall} />}
@@ -108,7 +119,7 @@ export default function MainApp() {
                 onLogout={logout}
               />
             )}
-          </div>
+          </main>
 
           <BottomNav items={navItems} activeTab={activeTab} setActiveTab={setActiveTab} />
           
@@ -136,7 +147,8 @@ export default function MainApp() {
         onSave={handleSaveContact}
         contact={editingContact}
       />
-      <audio id="remote-audio" autoPlay />
+      <audio id="remote-audio" />
+      <audio ref={ringtoneRef} src="/sounds/ringtone.mp3" loop />
     </>
   );
 }
